@@ -1,0 +1,6 @@
+Input file: TeamN1P3.ss
+   1: (define (main)
+   2:   (display 5)
+   3:   (newline)
+   4: )
+0 errors found in input file

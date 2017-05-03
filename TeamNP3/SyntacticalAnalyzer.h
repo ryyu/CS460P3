@@ -22,9 +22,12 @@ class SyntacticalAnalyzer
     private:
 	LexicalAnalyzer * lex;
 	ofstream p2file;
+	ofstream cpp;
 	token_type token;
 	int program ();
 	//int errors;
+	void PrintMain();
+	bool first;
 	int define ();
 	int more_defines ();
 	int param_list ();

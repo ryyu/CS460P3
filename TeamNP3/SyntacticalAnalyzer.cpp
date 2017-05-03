@@ -80,13 +80,20 @@ static map<token_type, int> tokenmap = {
 
 SyntacticalAnalyzer::SyntacticalAnalyzer (char * filename)
 {
-/********************************************************************************/
-/* This function will create an instance of a SyntacticalAnalyzer using the     */
-/* passed in filename. It will get the first token from the stream.		*/
-/* An instance of the LexicalAnalyzer will also get created.                    */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will create an instance of a SyntacticalAnalyzer using the     */
+  /* passed in filename. It will get the first token from the stream.		*/
+  /* An instance of the LexicalAnalyzer will also get created.                    */
+  /********************************************************************************/
   lex = new LexicalAnalyzer (filename);
   int fnlength = strlen (filename);
+  string file = string(filename);
+  first = true;
+  file[fnlength-2] = 'c';
+  file[fnlength-1] = 'p';
+  file += 'p';
+  
+  cpp.open(file);
   filename[fnlength-2] = 'p';
   filename[fnlength-1] = '2';
   p2file.open (filename);
@@ -98,10 +105,10 @@ SyntacticalAnalyzer::SyntacticalAnalyzer (char * filename)
 
 SyntacticalAnalyzer::~SyntacticalAnalyzer ()
 {
-/********************************************************************************/
-/* This function will delete the instance of the Lexical Analyzer created       */
-/* and close the debug file opened.                                             */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will delete the instance of the Lexical Analyzer created       */
+  /* and close the debug file opened.                                             */
+  /********************************************************************************/
   delete lex;
   p2file.close();
 }
@@ -109,59 +116,59 @@ SyntacticalAnalyzer::~SyntacticalAnalyzer ()
 
 int SyntacticalAnalyzer::program ()
 {
-/********************************************************************************/
-/* This function will check the rule at PROGRAM and also the current token.     */
-/* It will check for the expected tokens in program, and then call the correct  */
-/* functions corresponding to the following non-terminals.                      */
-/********************************************************************************/
-	lex->debug << "program function called\n";
-	p2file << "Starting <program>. Current token = " << token_names[token] << endl;
-	int errors = 0;
-	int rule = table[(int)PROGRAM][tokenmap[token]]; // PROGRAM is enum type corresponding to program row in table.
-	p2file << "Using rule " << rule << endl;
-       
-	if (token != LPAREN_T)
-	  {
-	    lex->ReportError("Unexpected token or character: " + token_names[token]);
-	    errors++; 
-	  }
+  /********************************************************************************/
+  /* This function will check the rule at PROGRAM and also the current token.     */
+  /* It will check for the expected tokens in program, and then call the correct  */
+  /* functions corresponding to the following non-terminals.                      */
+  /********************************************************************************/
+  lex->debug << "program function called\n";
+  p2file << "Starting <program>. Current token = " << token_names[token] << endl;
+  int errors = 0;
+  int rule = table[(int)PROGRAM][tokenmap[token]]; // PROGRAM is enum type corresponding to program row in table.
+  p2file << "Using rule " << rule << endl;
+  cpp << "#include<iostream>\n#include \"Object.h\"\nusing namespace std;\n\n";//includes
+  if (token != LPAREN_T)
+    {
+      lex->ReportError("Unexpected token or character: " + token_names[token]);
+      errors++; 
+    }
 	
-	// token should be in the firsts of program
-	// if true... keep going
-	// if false...
-	// Error message -
-	// then keep going or keep getting token until token is
-	// in the firsts of program
+  // token should be in the firsts of program
+  // if true... keep going
+  // if false...
+  // Error message -
+  // then keep going or keep getting token until token is
+  // in the firsts of program
 	
-	errors += define ();
+  errors += define ();
 
-	errors += more_defines ();
+  errors += more_defines ();
 	
-	if (token != EOF_T)
-	{
-	  lex->ReportError ("Expected end of file; " + lex->GetLexeme ());
-	  errors++;
-	}
+  if (token != EOF_T)
+    {
+      lex->ReportError ("Expected end of file; " + lex->GetLexeme ());
+      errors++;
+    }
 
-	// token should be in the follows of program
-	// if true... keep going
-	// if false...
-	// Error message -
-	// then keep going or keep getting token until token is
-	// in the follows of program
+  // token should be in the follows of program
+  // if true... keep going
+  // if false...
+  // Error message -
+  // then keep going or keep getting token until token is
+  // in the follows of program
 
-	p2file << "Ending <program>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
-	return errors;
+  p2file << "Ending <program>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
+  return errors;
 }
 
 
 int SyntacticalAnalyzer::define ()
 {
-/********************************************************************************/
-/* This function will check the rule at DEFINE and also the current token.      */
-/* It will check for the expected tokens in program, and then call the correct  */
-/* functions corresponding to the following non-terminals.                      */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will check the rule at DEFINE and also the current token.      */
+  /* It will check for the expected tokens in program, and then call the correct  */
+  /* functions corresponding to the following non-terminals.                      */
+  /********************************************************************************/
 
   p2file << "Starting <define>. Current token = " << token_names[token]  << endl;
   int errors = 0;
@@ -173,7 +180,7 @@ int SyntacticalAnalyzer::define ()
       lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: DEFINE_T");
       errors++;
     }
-
+  string tentativeOut = "Object ";
   token = lex->GetToken();
   
   if (token != DEFINE_T)
@@ -189,7 +196,7 @@ int SyntacticalAnalyzer::define ()
       lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: LPAREN_T");
       errors++;
     }
-
+  
   token = lex->GetToken();
   
   if (token != IDENT_T)
@@ -197,11 +204,16 @@ int SyntacticalAnalyzer::define ()
       lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: IDENT_T");
       errors++;     
     }
+  if(lex -> GetLexeme() == "main")
+    PrintMain();
+  else
+    cpp << tentativeOut + lex -> GetLexeme();
   
   token = lex->GetToken();
-  
+  cpp << "(";
   errors += param_list();
-
+  cpp << ")\n";
+  first = true;
   token = lex->GetToken();
 
   errors += stmt();
@@ -215,14 +227,18 @@ int SyntacticalAnalyzer::define ()
   
 }
 
+void SyntacticalAnalyzer::PrintMain()
+{
+  cpp << "int main";
+}
 
 int SyntacticalAnalyzer::more_defines()
 {
-/********************************************************************************/
-/* This function will check the rule at MORE_DEFINES and also the current token.*/
-/* It will check for the expected tokens in program, and then call the correct  */
-/* functions corresponding to the following non-terminals.                      */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will check the rule at MORE_DEFINES and also the current token.*/
+  /* It will check for the expected tokens in program, and then call the correct  */
+  /* functions corresponding to the following non-terminals.                      */
+  /********************************************************************************/
 
   p2file << "Starting <more_defines>. Current token = " << token_names[token]   << endl;
   int errors = 0;
@@ -247,28 +263,34 @@ int SyntacticalAnalyzer::more_defines()
 
 int SyntacticalAnalyzer::param_list ()
 {
-/********************************************************************************/
-/* This function will check the rule at PARAM_LIST and also the current token.  */
-/* It will check for the expected tokens in program, and then call the correct  */
-/* functions corresponding to the following non-terminals.                      */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will check the rule at PARAM_LIST and also the current token.  */
+  /* It will check for the expected tokens in program, and then call the correct  */
+  /* functions corresponding to the following non-terminals.                      */
+  /********************************************************************************/
 
   p2file << "Starting <param_list>. Current token = " << token_names[token]  << endl;
   int errors = 0;
   int rule = table[(int)PARAM_LIST][tokenmap[token]];
   p2file << "Using rule " << rule << endl;
-  
   if (token == IDENT_T)
-  {
-    token = lex->GetToken();
-    errors += param_list();
-  }
-  else if (token != RPAREN_T)
-  {
-    lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
-    errors++;
-  }
-
+    {
+      token = lex->GetToken();
+      if(first)
+	{
+	  cpp << "Object " << lex -> GetLexeme();
+	  first = false;
+	}
+      else
+	cpp << ", Object " << lex ->GetLexeme();
+      errors += param_list();
+    }
+  else if(token != RPAREN_T)
+    {
+      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
+      errors++;
+    }
+  
   p2file << "Ending <param_list>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   
   return errors; 
@@ -277,11 +299,11 @@ int SyntacticalAnalyzer::param_list ()
 
 int SyntacticalAnalyzer::stmt ()
 {
-/********************************************************************************/
-/* This function will check the rule at STMT and also the current token.        */
-/* It will check for the expected tokens in program, and then call the correct  */
-/* functions corresponding to the following non-terminals.                      */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will check the rule at STMT and also the current token.        */
+  /* It will check for the expected tokens in program, and then call the correct  */
+  /* functions corresponding to the following non-terminals.                      */
+  /********************************************************************************/
 
   int errors = 0; 
   p2file << "Starting <stmt>. ";
@@ -291,43 +313,43 @@ int SyntacticalAnalyzer::stmt ()
 
 
   if (token == IDENT_T)
-  {
-    token = lex->GetToken();
-  }
-  else if (token == LPAREN_T)
-  {
-    token = lex->GetToken();
-    errors += action();
-    if (token != RPAREN_T)
     {
-      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
-      errors++; 
+      token = lex->GetToken();
     }
-    token = lex->GetToken(); // gets rparen
-  }
+  else if (token == LPAREN_T)
+    {
+      token = lex->GetToken();
+      errors += action();
+      if (token != RPAREN_T)
+	{
+	  lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
+	  errors++; 
+	}
+      token = lex->GetToken(); // gets rparen
+    }
   else if ((token == QUOTE_T) || (token == NUMLIT_T))
-  {
-    errors += literal();
-  }
+    {
+      errors += literal();
+    }
   else
-  {
-    token = lex->GetToken();
-  }
+    {
+      token = lex->GetToken();
+    }
 
-p2file << "Ending <stmt>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
+  p2file << "Ending <stmt>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
 
-return errors;
+  return errors;
 
 }
 
 
 int SyntacticalAnalyzer::stmt_list()
 {
-/********************************************************************************/
-/* This function will check the rule at STMT_LIST and also the current token.   */
-/* It will check for the expected tokens in program, and then call the correct  */
-/* functions corresponding to the following non-terminals.                      */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will check the rule at STMT_LIST and also the current token.   */
+  /* It will check for the expected tokens in program, and then call the correct  */
+  /* functions corresponding to the following non-terminals.                      */
+  /********************************************************************************/
 
   int errors = 0; 
   p2file << "Starting <stmt_list>. ";
@@ -336,10 +358,10 @@ int SyntacticalAnalyzer::stmt_list()
   p2file << "Using rule " << rule << endl;
 
   if ((token != RPAREN_T) && (token != EOF_T))
-  {
-    errors += stmt();
-    errors += stmt_list();
-  }
+    {
+      errors += stmt();
+      errors += stmt_list();
+    }
 
   p2file << "Ending <stmt_list>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
@@ -348,11 +370,11 @@ int SyntacticalAnalyzer::stmt_list()
 
 int SyntacticalAnalyzer::else_part()
 {
-/********************************************************************************/
-/* This function will check the rule at ELSE_PART and also the current token.   */
-/* It will check for the expected tokens in program, and then call the correct  */
-/* functions corresponding to the following non-terminals.                      */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will check the rule at ELSE_PART and also the current token.   */
+  /* It will check for the expected tokens in program, and then call the correct  */
+  /* functions corresponding to the following non-terminals.                      */
+  /********************************************************************************/
 
   int errors = 0; 
   p2file << "Starting <else_part>. ";
@@ -361,13 +383,13 @@ int SyntacticalAnalyzer::else_part()
   p2file << "Using rule " << rule << endl;
 
   if (token == RPAREN_T)
-  {
+    {
 
-  }
+    }
   else
-  {
-    errors += stmt();
-  }
+    {
+      errors += stmt();
+    }
 
   p2file << "Ending <else_part>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
@@ -377,11 +399,11 @@ int SyntacticalAnalyzer::else_part()
 
 int SyntacticalAnalyzer::literal()
 {
-/********************************************************************************/
-/* This function will check the rule at LITERAL and also the current token.     */
-/* It will check for the expected tokens in program, and then call the correct  */
-/* functions corresponding to the following non-terminals.                      */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will check the rule at LITERAL and also the current token.     */
+  /* It will check for the expected tokens in program, and then call the correct  */
+  /* functions corresponding to the following non-terminals.                      */
+  /********************************************************************************/
 
   int errors = 0; 
   p2file << "Starting <literal>. ";
@@ -390,20 +412,20 @@ int SyntacticalAnalyzer::literal()
   p2file << "Using rule " << rule << endl;
 
   if (token == NUMLIT_T)
-  {
-    token = lex->GetToken();
-    // do nothing. continue to return statement. 
-  }
+    {
+      token = lex->GetToken();
+      // do nothing. continue to return statement. 
+    }
   else if (token == QUOTE_T)
-  {
-    token = lex->GetToken();
-    errors += quoted_lit();
-  }
+    {
+      token = lex->GetToken();
+      errors += quoted_lit();
+    }
   else
-  {
-    lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: NUMLIT_T or QUOTE_T");
-    errors++; 
-  }
+    {
+      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: NUMLIT_T or QUOTE_T");
+      errors++; 
+    }
 
   p2file << "Ending <literal>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
@@ -413,11 +435,11 @@ int SyntacticalAnalyzer::literal()
 
 int SyntacticalAnalyzer::quoted_lit()
 {
-/********************************************************************************/
-/* This function will check the rule at QUOTED_LIT and also the current token.  */
-/* It will check for the expected tokens in program, and then call the correct  */
-/* functions corresponding to the following non-terminals.                      */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will check the rule at QUOTED_LIT and also the current token.  */
+  /* It will check for the expected tokens in program, and then call the correct  */
+  /* functions corresponding to the following non-terminals.                      */
+  /********************************************************************************/
 
   int errors = 0; 
   p2file << "Starting <quoted_lit>. ";
@@ -436,11 +458,11 @@ int SyntacticalAnalyzer::quoted_lit()
 
 int SyntacticalAnalyzer::action()
 {
-/********************************************************************************/
-/* This function will check the rule at ACTION and also the current token.      */
-/* It will check for the expected tokens in program, and then call the correct  */
-/* functions corresponding to the following non-terminals.                      */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will check the rule at ACTION and also the current token.      */
+  /* It will check for the expected tokens in program, and then call the correct  */
+  /* functions corresponding to the following non-terminals.                      */
+  /********************************************************************************/
 
   int errors = 0; 
   p2file << "Starting <action>. ";
@@ -450,60 +472,60 @@ int SyntacticalAnalyzer::action()
 
   
   if (token == NEWLINE_T)
-  {
-    token = lex->GetToken();
-  }
+    {
+      token = lex->GetToken();
+    }
   else if (token == IF_T)
-  {
-    token = lex->GetToken();
-    errors += stmt();
-    errors += stmt();
-    errors += else_part();
-  }
+    {
+      token = lex->GetToken();
+      errors += stmt();
+      errors += stmt();
+      errors += else_part();
+    }
   else if(token == CONS_T)
-  {
-    token = lex->GetToken();
-    errors += stmt();
-    errors += stmt();
-  }
+    {
+      token = lex->GetToken();
+      errors += stmt();
+      errors += stmt();
+    }
   else if ((token == NOT_T) || (token == NUMBERP_T) || (token == SYMBOLP_T) || (token == LISTP_T) || (token == ZEROP_T) || 
-      (token == NULLP_T) || (token == CHARP_T) || (token == STRINGP_T) || (token == DISPLAY_T) || (token == LISTOP_T))
-  {
-    token = lex->GetToken();
-    errors += stmt(); 
-  }
+	   (token == NULLP_T) || (token == CHARP_T) || (token == STRINGP_T) || (token == DISPLAY_T) || (token == LISTOP_T))
+    {
+      token = lex->GetToken();
+      errors += stmt(); 
+    }
   else if ((token == PLUS_T) || (token == AND_T) || (token == OR_T) || (token == MULT_T) || (token == EQUALTO_T) || (token == GT_T) || 
            (token == LT_T) || (token == GTE_T) || (token == LTE_T) || (token == IDENT_T))
-  {
-    token = lex->GetToken();
-    errors += stmt_list();
-  }
-  else if((token == MINUS_T) || (token == DIV_T))
-  {
-    token = lex->GetToken();
-    errors += stmt();
-    errors += stmt_list();
-    if (token != RPAREN_T)
     {
-      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
-      errors++; 
+      token = lex->GetToken();
+      errors += stmt_list();
     }
-  }
+  else if((token == MINUS_T) || (token == DIV_T))
+    {
+      token = lex->GetToken();
+      errors += stmt();
+      errors += stmt_list();
+      if (token != RPAREN_T)
+	{
+	  lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
+	  errors++; 
+	}
+    }
 
- p2file << "Ending <action>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
+  p2file << "Ending <action>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
  
- return errors;
+  return errors;
 
 }
 
 
 int SyntacticalAnalyzer::any_other_token ()
 {
-/********************************************************************************/
-/* This function will check the rule at ANY_OTHER_TOKEN and also the current    */
-/* token. It will check for the expected tokens in program, and then call       */
-/* the correct functions corresponding to the following non-terminals.          */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will check the rule at ANY_OTHER_TOKEN and also the current    */
+  /* token. It will check for the expected tokens in program, and then call       */
+  /* the correct functions corresponding to the following non-terminals.          */
+  /********************************************************************************/
 
   int errors = 0; 
   p2file << "Starting <any_other_token>. ";
@@ -512,19 +534,19 @@ int SyntacticalAnalyzer::any_other_token ()
   p2file << "Using rule " << rule << endl;
 
   if (token == LPAREN_T)
-  {
-    token = lex->GetToken();
-    errors += more_tokens();
-    token = lex->GetToken();
-  }
+    {
+      token = lex->GetToken();
+      errors += more_tokens();
+      token = lex->GetToken();
+    }
   else if (token == ERROR_T)
-  {
-    lex->ReportError("Unexpected token or character. Recieved: " + lex->GetLexeme());
-  }
+    {
+      lex->ReportError("Unexpected token or character. Recieved: " + lex->GetLexeme());
+    }
   else
-  {
-    token = lex->GetToken();
-  }
+    {
+      token = lex->GetToken();
+    }
 
   p2file << "Ending <any_other_token>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
@@ -533,11 +555,11 @@ int SyntacticalAnalyzer::any_other_token ()
 
 int SyntacticalAnalyzer::more_tokens ()
 {
-/********************************************************************************/
-/* This function will check the rule at MORE_TOKENS and also the current token. */
-/* It will check for the expected tokens in program, and then call the correct  */
-/* functions corresponding to the following non-terminals.                      */
-/********************************************************************************/
+  /********************************************************************************/
+  /* This function will check the rule at MORE_TOKENS and also the current token. */
+  /* It will check for the expected tokens in program, and then call the correct  */
+  /* functions corresponding to the following non-terminals.                      */
+  /********************************************************************************/
 
   int errors = 0; 
   p2file << "Starting <more_tokens>. ";
@@ -546,14 +568,14 @@ int SyntacticalAnalyzer::more_tokens ()
   p2file << "Using rule " << rule << endl;
 
   if ((token == RPAREN_T) || (token == EOF_T))
-  {
+    {
 
-  }
+    }
   else
-  {
-    errors += any_other_token();
-    errors += more_tokens();
-  }
+    {
+      errors += any_other_token();
+      errors += more_tokens();
+    }
 
   p2file << "Ending <more_tokens>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
