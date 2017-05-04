@@ -180,7 +180,6 @@ int SyntacticalAnalyzer::define ()
       lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: DEFINE_T");
       errors++;
     }
-  string tentativeOut = "Object ";
   token = lex->GetToken();
   
   if (token != DEFINE_T)
@@ -205,9 +204,9 @@ int SyntacticalAnalyzer::define ()
       errors++;     
     }
   if(lex -> GetLexeme() == "main")
-    PrintMain();
+    cpp << "int main";
   else
-    cpp << tentativeOut + lex -> GetLexeme();
+    cpp << "Object " << lex -> GetLexeme();
   
   token = lex->GetToken();
   cpp << "(";
@@ -215,21 +214,16 @@ int SyntacticalAnalyzer::define ()
   cpp << ")\n";
   first = true;
   token = lex->GetToken();
-
+  cpp << "{\n";
   errors += stmt();
 
   errors += stmt_list();
 
   token = lex->GetToken();
-
+  cpp << "}\n\n";
   p2file << "Ending <define>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
   
-}
-
-void SyntacticalAnalyzer::PrintMain()
-{
-  cpp << "int main";
 }
 
 int SyntacticalAnalyzer::more_defines()
@@ -275,7 +269,6 @@ int SyntacticalAnalyzer::param_list ()
   p2file << "Using rule " << rule << endl;
   if (token == IDENT_T)
     {
-      token = lex->GetToken();
       if(first)
 	{
 	  cpp << "Object " << lex -> GetLexeme();
@@ -283,6 +276,7 @@ int SyntacticalAnalyzer::param_list ()
 	}
       else
 	cpp << ", Object " << lex ->GetLexeme();
+      token = lex->GetToken();
       errors += param_list();
     }
   else if(token != RPAREN_T)

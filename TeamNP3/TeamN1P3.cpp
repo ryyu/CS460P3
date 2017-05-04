@@ -2,4 +2,7 @@
 #include "Object.h"
 using namespace std;
 
-int main()
+Object not_main(Object a, Object b)
+{
+}
+

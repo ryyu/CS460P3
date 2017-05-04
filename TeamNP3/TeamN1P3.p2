@@ -2,8 +2,14 @@ Starting <program>. Current token = LPAREN_T
 Using rule 1
 Starting <define>. Current token = LPAREN_T
 Using rule 2
+Starting <param_list>. Current token = IDENT_T
+Using rule 15
+Starting <param_list>. Current token = IDENT_T
+Using rule 15
 Starting <param_list>. Current token = RPAREN_T
 Using rule 16
+Ending <param_list>. Current token = RPAREN_T. Errors = 0
+Ending <param_list>. Current token = RPAREN_T. Errors = 0
 Ending <param_list>. Current token = RPAREN_T. Errors = 0
 Starting <stmt>. Current token = LPAREN_T
 Using rule 9

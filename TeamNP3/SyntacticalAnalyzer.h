@@ -26,7 +26,6 @@ class SyntacticalAnalyzer
 	token_type token;
 	int program ();
 	//int errors;
-	void PrintMain();
 	bool first;
 	int define ();
 	int more_defines ();

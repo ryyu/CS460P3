@@ -1,5 +1,5 @@
 Input file: TeamN1P3.ss
-   1: (define (main)
+   1: (define (not_main a b)
    2:   (display 5)
    3:   (newline)
    4: )
