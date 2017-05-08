@@ -1,5 +1,7 @@
-P2.out : Project2.o SetLimits.o LexicalAnalyzer.o SyntacticalAnalyzer.o
-	g++ -std=c++11 -g -o P2.out Project2.o SetLimits.o LexicalAnalyzer.o SyntacticalAnalyzer.o
+testNum = 1
+
+P3.out : Project2.o SetLimits.o LexicalAnalyzer.o SyntacticalAnalyzer.o
+	g++ -std=c++11 -g -o P3.out Project2.o SetLimits.o LexicalAnalyzer.o SyntacticalAnalyzer.o
 
 Project2.o : Project2.cpp SetLimits.h SyntacticalAnalyzer.h
 	g++ -std=c++11 -g -c Project2.cpp
@@ -15,6 +17,11 @@ SyntacticalAnalyzer.o : SyntacticalAnalyzer.cpp SyntacticalAnalyzer.h LexicalAna
 
 clean : 
 	rm *.o P2.out *.gch *~
+
+run:
+	make
+	./P3.out TeamN$(testNum)P3.ss
+	more TeamN$(testNum)P3.cpp
 
 submit : Project2.cpp LexicalAnalyzer.h LexicalAnalyzer.save SyntacticalAnalyzer.h SyntacticalAnalyzer.cpp makefile README.txt
 	rm -rf TeamBP2

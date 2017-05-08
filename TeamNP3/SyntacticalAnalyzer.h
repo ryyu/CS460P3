@@ -33,7 +33,7 @@ class SyntacticalAnalyzer
 	int stmt ();
 	int literal ();
 	int action ();
-	int stmt_list ();
+	int stmt_list (string);
 	int quoted_lit ();
 	int any_other_token ();
 	int more_tokens ();

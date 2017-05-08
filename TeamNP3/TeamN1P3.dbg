@@ -1,22 +1,68 @@
 Input file: TeamN1P3.ss
-   1: (define (not_main a b)
+   1: ;(define (not_main a b)
+   2:  ; (display 5)
+   3:   ;(newline)
+   4: ;)
+   5: 
+   6: (define (multTest)
 	LPAREN_T        (
 program function called
 	DEFINE_T        define
 	LPAREN_T        (
-	IDENT_T         not_main
-	IDENT_T         a
-	IDENT_T         b
+	IDENT_T         multTest
 	RPAREN_T        )
-   2:   (display 5)
+   7: 	(* 7 2)
 	LPAREN_T        (
-	DISPLAY_T       display
-	NUMLIT_T        5
+	MULT_T          *
+	NUMLIT_T        7
+	NUMLIT_T        2
 	RPAREN_T        )
-   3:   (newline)
+   8: 	)
+	RPAREN_T        )
+   9: 
+  10: (define (plusTest n)
 	LPAREN_T        (
-	NEWLINE_T       newline
+	DEFINE_T        define
+	LPAREN_T        (
+	IDENT_T         plusTest
+	IDENT_T         n
 	RPAREN_T        )
-   4: )
+  11: 	(+ n 4 6)
+	LPAREN_T        (
+	PLUS_T          +
+	IDENT_T         n
+	NUMLIT_T        4
+	NUMLIT_T        6
+	RPAREN_T        )
+  12: 	)
+	RPAREN_T        )
+  13: 
+  14: (define (plusMultTest n)
+	LPAREN_T        (
+	DEFINE_T        define
+	LPAREN_T        (
+	IDENT_T         plusMultTest
+	IDENT_T         n
+	RPAREN_T        )
+  15: 	(+ (* n 17) n 8 92)
+	LPAREN_T        (
+	PLUS_T          +
+	LPAREN_T        (
+	MULT_T          *
+	IDENT_T         n
+	NUMLIT_T        17
+	RPAREN_T        )
+	IDENT_T         n
+	NUMLIT_T        8
+	NUMLIT_T        92
+	RPAREN_T        )
+  16: 	(+ n 4 6)
+	LPAREN_T        (
+	PLUS_T          +
+	IDENT_T         n
+	NUMLIT_T        4
+	NUMLIT_T        6
+	RPAREN_T        )
+  17: 	)
 	RPAREN_T        )
 0 errors found in input file

@@ -1,6 +1,19 @@
 Input file: TeamN1P3.ss
-   1: (define (not_main a b)
-   2:   (display 5)
-   3:   (newline)
-   4: )
+   1: ;(define (not_main a b)
+   2:  ; (display 5)
+   3:   ;(newline)
+   4: ;)
+   5: 
+   6: (define (multTest)
+   7: 	(* 7 2)
+   8: 	)
+   9: 
+  10: (define (plusTest n)
+  11: 	(+ n 4 6)
+  12: 	)
+  13: 
+  14: (define (plusMultTest n)
+  15: 	(+ (* n 17) n 8 92)
+  16: 	(+ n 4 6)
+  17: 	)
 0 errors found in input file

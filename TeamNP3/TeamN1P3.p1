@@ -1,15 +1,48 @@
 	LPAREN_T        (
 	DEFINE_T        define
 	LPAREN_T        (
-	IDENT_T         not_main
-	IDENT_T         a
-	IDENT_T         b
+	IDENT_T         multTest
 	RPAREN_T        )
 	LPAREN_T        (
-	DISPLAY_T       display
-	NUMLIT_T        5
+	MULT_T          *
+	NUMLIT_T        7
+	NUMLIT_T        2
+	RPAREN_T        )
 	RPAREN_T        )
 	LPAREN_T        (
-	NEWLINE_T       newline
+	DEFINE_T        define
+	LPAREN_T        (
+	IDENT_T         plusTest
+	IDENT_T         n
+	RPAREN_T        )
+	LPAREN_T        (
+	PLUS_T          +
+	IDENT_T         n
+	NUMLIT_T        4
+	NUMLIT_T        6
+	RPAREN_T        )
+	RPAREN_T        )
+	LPAREN_T        (
+	DEFINE_T        define
+	LPAREN_T        (
+	IDENT_T         plusMultTest
+	IDENT_T         n
+	RPAREN_T        )
+	LPAREN_T        (
+	PLUS_T          +
+	LPAREN_T        (
+	MULT_T          *
+	IDENT_T         n
+	NUMLIT_T        17
+	RPAREN_T        )
+	IDENT_T         n
+	NUMLIT_T        8
+	NUMLIT_T        92
+	RPAREN_T        )
+	LPAREN_T        (
+	PLUS_T          +
+	IDENT_T         n
+	NUMLIT_T        4
+	NUMLIT_T        6
 	RPAREN_T        )
 	RPAREN_T        )

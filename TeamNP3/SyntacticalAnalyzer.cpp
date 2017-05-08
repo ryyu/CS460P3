@@ -24,9 +24,9 @@ using namespace std;
 // This enumerated type is used to index the table at the correct non-terminal token.
 // Its purpose is to make reading the code easier. 
 enum nonTerminals {PROGRAM=0, DEFINE, MORE_DEFINES, STMT_LIST, STMT, LITERAL, QUOTED_LIT, MORE_TOKENS,
-		   PARAM_LIST, ELSE_PART, ACTION, ANY_OTHER_TOKEN};
+ PARAM_LIST, ELSE_PART, ACTION, ANY_OTHER_TOKEN};
 
-static int table[12][32] = {
+ static int table[12][32] = {
   // EOF_T,LPAREN_T,DEFINE_T,IDENT_T,RPAREN_T,NUMLIT_T,QUOTE_T,IF_T,LISTOP_T,CONS_T,AND_T,OR_T,NOT_T,NUMBERP_T,SYMBOLP_T,LISTP_T,ZEROP_T,NULLP_T,CHARP_T,STRINGP_T,PLUS_T,MINUS_T,DIV_T,MULT_T,EQUALTO_T,GT_T,LT_T,GTE_T,LTE_T,DISPLAY_T,NEWLINE_T,$
   {74,1,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74}, // <program>
   {74,2,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74,74}, // <define>
@@ -128,27 +128,27 @@ int SyntacticalAnalyzer::program ()
   p2file << "Using rule " << rule << endl;
   cpp << "#include<iostream>\n#include \"Object.h\"\nusing namespace std;\n\n";//includes
   if (token != LPAREN_T)
-    {
-      lex->ReportError("Unexpected token or character: " + token_names[token]);
-      errors++; 
-    }
-	
+  {
+    lex->ReportError("Unexpected token or character: " + token_names[token]);
+    errors++; 
+  }
+
   // token should be in the firsts of program
   // if true... keep going
   // if false...
   // Error message -
   // then keep going or keep getting token until token is
   // in the firsts of program
-	
+
   errors += define ();
 
   errors += more_defines ();
-	
+
   if (token != EOF_T)
-    {
-      lex->ReportError ("Expected end of file; " + lex->GetLexeme ());
-      errors++;
-    }
+  {
+    lex->ReportError ("Expected end of file; " + lex->GetLexeme ());
+    errors++;
+  }
 
   // token should be in the follows of program
   // if true... keep going
@@ -176,33 +176,33 @@ int SyntacticalAnalyzer::define ()
   p2file << "Using rule " << rule << endl;
   
   if (token != LPAREN_T)
-    {     
-      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: DEFINE_T");
-      errors++;
-    }
+  {     
+    lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: DEFINE_T");
+    errors++;
+  }
   token = lex->GetToken();
   
   if (token != DEFINE_T)
-    {     
-      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: DEFINE_T");
-      errors++;
-    }
+  {     
+    lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: DEFINE_T");
+    errors++;
+  }
   
   token = lex->GetToken();
   
   if (token != LPAREN_T)
-    {
-      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: LPAREN_T");
-      errors++;
-    }
+  {
+    lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: LPAREN_T");
+    errors++;
+  }
   
   token = lex->GetToken();
   
   if (token != IDENT_T)
-    {
-      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: IDENT_T");
-      errors++;     
-    }
+  {
+    lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: IDENT_T");
+    errors++;     
+  }
   if(lex -> GetLexeme() == "main")
     cpp << "int main";
   else
@@ -214,13 +214,13 @@ int SyntacticalAnalyzer::define ()
   cpp << ")\n";
   first = true;
   token = lex->GetToken();
-  cpp << "{\n";
+  cpp << "{\n\n\t";
   errors += stmt();
 
-  errors += stmt_list();
+  errors += stmt_list(";");
 
   token = lex->GetToken();
-  cpp << "}\n\n";
+  cpp << "\n}\n\n";
   p2file << "Ending <define>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
   
@@ -240,14 +240,14 @@ int SyntacticalAnalyzer::more_defines()
   p2file << "Using rule " << rule << endl;
   
   if ((token == RPAREN_T) || (token == EOF_T))
-    {
+  {
 
-    }
+  }
   else
-    {
-      errors += define();
-      errors += more_defines();
-    }
+  {
+    errors += define();
+    errors += more_defines();
+  }
   
   p2file << "Ending <more_defines>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
@@ -268,26 +268,26 @@ int SyntacticalAnalyzer::param_list ()
   int rule = table[(int)PARAM_LIST][tokenmap[token]];
   p2file << "Using rule " << rule << endl;
   if (token == IDENT_T)
+  {
+    if(first)
     {
-      if(first)
-	{
-	  cpp << "Object " << lex -> GetLexeme();
-	  first = false;
-	}
-      else
-	cpp << ", Object " << lex ->GetLexeme();
-      token = lex->GetToken();
-      errors += param_list();
-    }
-  else if(token != RPAREN_T)
-    {
-      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
-      errors++;
-    }
-  
-  p2file << "Ending <param_list>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
-  
-  return errors; 
+     cpp << "Object " << lex -> GetLexeme();
+     first = false;
+   }
+   else
+     cpp << ", Object " << lex ->GetLexeme();
+   token = lex->GetToken();
+   errors += param_list();
+ }
+ else if(token != RPAREN_T)
+ {
+  lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
+  errors++;
+}
+
+p2file << "Ending <param_list>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
+
+return errors; 
 }
 
 
@@ -305,216 +305,231 @@ int SyntacticalAnalyzer::stmt ()
   int rule = table[(int)STMT][tokenmap[token]];
   p2file << "Using rule " << rule << endl;
 
+  cpp << "(";
 
   if (token == IDENT_T)
-    {
-      token = lex->GetToken();
-    }
+  {
+    cpp << lex->GetLexeme();
+    token = lex->GetToken();
+  }
   else if (token == LPAREN_T)
+  {
+    token = lex->GetToken();
+
+    errors += action();
+    if (token != RPAREN_T)
     {
-      token = lex->GetToken();
-      errors += action();
-      if (token != RPAREN_T)
-	{
-	  lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
-	  errors++; 
-	}
+      lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
+      errors++; 
+    }
       token = lex->GetToken(); // gets rparen
     }
-  else if ((token == QUOTE_T) || (token == NUMLIT_T))
+    else if ((token == QUOTE_T) || (token == NUMLIT_T))
     {
       errors += literal();
     }
-  else
+    else
     {
       token = lex->GetToken();
     }
 
-  p2file << "Ending <stmt>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
+    cpp << ")";
+    p2file << "Ending <stmt>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
 
-  return errors;
+    return errors;
 
-}
+  }
 
 
-int SyntacticalAnalyzer::stmt_list()
-{
+  int SyntacticalAnalyzer::stmt_list(string action)
+  {
   /********************************************************************************/
   /* This function will check the rule at STMT_LIST and also the current token.   */
   /* It will check for the expected tokens in program, and then call the correct  */
   /* functions corresponding to the following non-terminals.                      */
   /********************************************************************************/
 
-  int errors = 0; 
-  p2file << "Starting <stmt_list>. ";
-  p2file << "Current token = " << token_names[token]  << endl;
-  int rule = table[(int)STMT_LIST][tokenmap[token]];
-  p2file << "Using rule " << rule << endl;
+    int errors = 0; 
+    p2file << "Starting <stmt_list>. ";
+    p2file << "Current token = " << token_names[token]  << endl;
+    int rule = table[(int)STMT_LIST][tokenmap[token]];
+    p2file << "Using rule " << rule << endl;
 
-  if ((token != RPAREN_T) && (token != EOF_T))
+    if (action == ";")
     {
-      errors += stmt();
-      errors += stmt_list();
+       cpp << ";\n\t";
     }
 
-  p2file << "Ending <stmt_list>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
-  return errors;
-}
+    if ((token != RPAREN_T) && (token != EOF_T))
+    {
+      errors += stmt();
+      if (token != RPAREN_T)
+      {
+        cpp << action;
+      }
+      errors += stmt_list(action);
+    }
+  
+
+    p2file << "Ending <stmt_list>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
+    return errors;
+  }
 
 
-int SyntacticalAnalyzer::else_part()
-{
+  int SyntacticalAnalyzer::else_part()
+  {
   /********************************************************************************/
   /* This function will check the rule at ELSE_PART and also the current token.   */
   /* It will check for the expected tokens in program, and then call the correct  */
   /* functions corresponding to the following non-terminals.                      */
   /********************************************************************************/
 
-  int errors = 0; 
-  p2file << "Starting <else_part>. ";
-  p2file << "Current token = " << token_names[token]  << endl;
-  int rule = table[(int)ELSE_PART][tokenmap[token]];
-  p2file << "Using rule " << rule << endl;
+    int errors = 0; 
+    p2file << "Starting <else_part>. ";
+    p2file << "Current token = " << token_names[token]  << endl;
+    int rule = table[(int)ELSE_PART][tokenmap[token]];
+    p2file << "Using rule " << rule << endl;
 
-  if (token == RPAREN_T)
+    if (token == RPAREN_T)
     {
 
     }
-  else
+    else
     {
       errors += stmt();
     }
 
-  p2file << "Ending <else_part>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
-  return errors;
+    p2file << "Ending <else_part>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
+    return errors;
 
-}
+  }
 
 
-int SyntacticalAnalyzer::literal()
-{
+  int SyntacticalAnalyzer::literal()
+  {
   /********************************************************************************/
   /* This function will check the rule at LITERAL and also the current token.     */
   /* It will check for the expected tokens in program, and then call the correct  */
   /* functions corresponding to the following non-terminals.                      */
   /********************************************************************************/
 
-  int errors = 0; 
-  p2file << "Starting <literal>. ";
-  p2file << "Current token = " << token_names[token]  << endl;
-  int rule = table[(int)LITERAL][tokenmap[token]];
-  p2file << "Using rule " << rule << endl;
+    int errors = 0; 
+    p2file << "Starting <literal>. ";
+    p2file << "Current token = " << token_names[token]  << endl;
+    int rule = table[(int)LITERAL][tokenmap[token]];
+    p2file << "Using rule " << rule << endl;
 
-  if (token == NUMLIT_T)
+    if (token == NUMLIT_T)
     {
-      token = lex->GetToken();
+      cpp << "Object(" << lex->GetLexeme() << ")";
+      token = lex->GetToken();    
       // do nothing. continue to return statement. 
     }
-  else if (token == QUOTE_T)
+    else if (token == QUOTE_T)
     {
       token = lex->GetToken();
       errors += quoted_lit();
     }
-  else
+    else
     {
       lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: NUMLIT_T or QUOTE_T");
       errors++; 
     }
 
-  p2file << "Ending <literal>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
-  return errors;
+    p2file << "Ending <literal>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
+    return errors;
 
-}
+  }
 
 
-int SyntacticalAnalyzer::quoted_lit()
-{
+  int SyntacticalAnalyzer::quoted_lit()
+  {
   /********************************************************************************/
   /* This function will check the rule at QUOTED_LIT and also the current token.  */
   /* It will check for the expected tokens in program, and then call the correct  */
   /* functions corresponding to the following non-terminals.                      */
   /********************************************************************************/
 
-  int errors = 0; 
-  p2file << "Starting <quoted_lit>. ";
-  p2file << "Current token = " << token_names[token]  << endl;
-  int rule = table[(int)QUOTED_LIT][tokenmap[token]];
-  p2file << "Using rule " << rule << endl;
+    int errors = 0; 
+    p2file << "Starting <quoted_lit>. ";
+    p2file << "Current token = " << token_names[token]  << endl;
+    int rule = table[(int)QUOTED_LIT][tokenmap[token]];
+    p2file << "Using rule " << rule << endl;
 
   // next token already parsed from literal()
-  errors += any_other_token();
+    errors += any_other_token();
 
-  p2file << "Ending <quoted_lit>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
-  return errors;
+    p2file << "Ending <quoted_lit>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
+    return errors;
 
-}
+  }
 
 
-int SyntacticalAnalyzer::action()
-{
+  int SyntacticalAnalyzer::action()
+  {
   /********************************************************************************/
   /* This function will check the rule at ACTION and also the current token.      */
   /* It will check for the expected tokens in program, and then call the correct  */
   /* functions corresponding to the following non-terminals.                      */
   /********************************************************************************/
 
-  int errors = 0; 
-  p2file << "Starting <action>. ";
-  p2file << "Current token = " << token_names[token]  << endl;
-  int rule = table[(int)ACTION][tokenmap[token]];
-  p2file << "Using rule " << rule << endl;
+    int errors = 0; 
+    p2file << "Starting <action>. ";
+    p2file << "Current token = " << token_names[token]  << endl;
+    int rule = table[(int)ACTION][tokenmap[token]];
+    p2file << "Using rule " << rule << endl;
+    string operation = " " + lex->GetLexeme() + " ";
 
-  
-  if (token == NEWLINE_T)
+    if (token == NEWLINE_T)
     {
       token = lex->GetToken();
     }
-  else if (token == IF_T)
+    else if (token == IF_T)
     {
       token = lex->GetToken();
       errors += stmt();
       errors += stmt();
       errors += else_part();
     }
-  else if(token == CONS_T)
+    else if(token == CONS_T)
     {
       token = lex->GetToken();
       errors += stmt();
       errors += stmt();
     }
-  else if ((token == NOT_T) || (token == NUMBERP_T) || (token == SYMBOLP_T) || (token == LISTP_T) || (token == ZEROP_T) || 
-	   (token == NULLP_T) || (token == CHARP_T) || (token == STRINGP_T) || (token == DISPLAY_T) || (token == LISTOP_T))
+    else if ((token == NOT_T) || (token == NUMBERP_T) || (token == SYMBOLP_T) || (token == LISTP_T) || (token == ZEROP_T) || 
+      (token == NULLP_T) || (token == CHARP_T) || (token == STRINGP_T) || (token == DISPLAY_T) || (token == LISTOP_T))
     {
       token = lex->GetToken();
       errors += stmt(); 
     }
-  else if ((token == PLUS_T) || (token == AND_T) || (token == OR_T) || (token == MULT_T) || (token == EQUALTO_T) || (token == GT_T) || 
-           (token == LT_T) || (token == GTE_T) || (token == LTE_T) || (token == IDENT_T))
+    else if ((token == PLUS_T) || (token == AND_T) || (token == OR_T) || (token == MULT_T) || (token == EQUALTO_T) || (token == GT_T) || 
+     (token == LT_T) || (token == GTE_T) || (token == LTE_T) || (token == IDENT_T))
     {
       token = lex->GetToken();
-      errors += stmt_list();
+      errors += stmt_list(operation);
     }
-  else if((token == MINUS_T) || (token == DIV_T))
+    else if((token == MINUS_T) || (token == DIV_T))
     {
       token = lex->GetToken();
       errors += stmt();
-      errors += stmt_list();
+      errors += stmt_list(operation);
       if (token != RPAREN_T)
-	{
-	  lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
-	  errors++; 
-	}
-    }
+      {
+       lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");
+       errors++; 
+     }
+   }
 
-  p2file << "Ending <action>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
- 
-  return errors;
+   p2file << "Ending <action>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
 
-}
+   return errors;
+
+ }
 
 
-int SyntacticalAnalyzer::any_other_token ()
-{
+ int SyntacticalAnalyzer::any_other_token ()
+ {
   /********************************************************************************/
   /* This function will check the rule at ANY_OTHER_TOKEN and also the current    */
   /* token. It will check for the expected tokens in program, and then call       */
@@ -528,19 +543,19 @@ int SyntacticalAnalyzer::any_other_token ()
   p2file << "Using rule " << rule << endl;
 
   if (token == LPAREN_T)
-    {
-      token = lex->GetToken();
-      errors += more_tokens();
-      token = lex->GetToken();
-    }
+  {
+    token = lex->GetToken();
+    errors += more_tokens();
+    token = lex->GetToken();
+  }
   else if (token == ERROR_T)
-    {
-      lex->ReportError("Unexpected token or character. Recieved: " + lex->GetLexeme());
-    }
+  {
+    lex->ReportError("Unexpected token or character. Recieved: " + lex->GetLexeme());
+  }
   else
-    {
-      token = lex->GetToken();
-    }
+  {
+    token = lex->GetToken();
+  }
 
   p2file << "Ending <any_other_token>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
@@ -562,14 +577,14 @@ int SyntacticalAnalyzer::more_tokens ()
   p2file << "Using rule " << rule << endl;
 
   if ((token == RPAREN_T) || (token == EOF_T))
-    {
+  {
 
-    }
+  }
   else
-    {
-      errors += any_other_token();
-      errors += more_tokens();
-    }
+  {
+    errors += any_other_token();
+    errors += more_tokens();
+  }
 
   p2file << "Ending <more_tokens>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
