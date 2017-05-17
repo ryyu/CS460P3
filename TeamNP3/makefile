@@ -1,7 +1,7 @@
 testNum = 1
 
-P3.out : Project2.o SetLimits.o LexicalAnalyzer.o SyntacticalAnalyzer.o
-	g++ -std=c++11 -g -o P3.out Project2.o SetLimits.o LexicalAnalyzer.o SyntacticalAnalyzer.o
+P3.out : Project2.o SetLimits.o LexicalAnalyzer.o SyntacticalAnalyzer.o CodeGen.o
+	g++ -std=c++11 -g -o P3.out Project2.o SetLimits.o LexicalAnalyzer.o SyntacticalAnalyzer.o CodeGen.o
 
 Project2.o : Project2.cpp SetLimits.h SyntacticalAnalyzer.h
 	g++ -std=c++11 -g -c Project2.cpp
@@ -12,8 +12,11 @@ SetLimits.o : SetLimits.cpp SetLimits.h
 LexicalAnalyzer.o : LexicalAnalyzer.save
 	cp LexicalAnalyzer.save LexicalAnalyzer.o
 
-SyntacticalAnalyzer.o : SyntacticalAnalyzer.cpp SyntacticalAnalyzer.h LexicalAnalyzer.h
+SyntacticalAnalyzer.o : SyntacticalAnalyzer.cpp SyntacticalAnalyzer.h LexicalAnalyzer.h CodeGen.h
 	g++ -std=c++11  -g -c SyntacticalAnalyzer.cpp
+
+CodeGen.o: CodeGen.h CodeGen.cpp
+	g++ -std=c++11 -g -c CodeGen.cpp
 
 clean : 
 	rm *.o P2.out *.gch *~

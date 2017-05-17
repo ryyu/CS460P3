@@ -13,7 +13,22 @@ Input file: TeamN1P3.ss
   12: 	)
   13: 
   14: (define (plusMultTest n)
-  15: 	(+ (* n 17) n 8 92)
+  15: 	(+ (* n 17) n (* 8 92))
   16: 	(+ n 4 6)
   17: 	)
+  18: 
+  19: (define (ifstmt a b)
+  20: 	(if(< a b)
+  21: 		a
+  22: 		b
+  23: 		)
+  24: 	(if(>= a b)
+  25: 		b
+  26: 		a
+  27: 		)
+  28: 	)
+  29: 
+  30: (define(funcAll a b c)
+  31: 	(plusTest a)
+  32: 	)
 0 errors found in input file

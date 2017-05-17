@@ -89,11 +89,9 @@ SyntacticalAnalyzer::SyntacticalAnalyzer (char * filename)
   int fnlength = strlen (filename);
   string file = string(filename);
   first = true;
-  file[fnlength-2] = 'c';
-  file[fnlength-1] = 'p';
-  file += 'p';
+  ifstmt = false;
+  generator = new CodeGen(file);
   
-  cpp.open(file);
   filename[fnlength-2] = 'p';
   filename[fnlength-1] = '2';
   p2file.open (filename);
@@ -110,6 +108,7 @@ SyntacticalAnalyzer::~SyntacticalAnalyzer ()
   /* and close the debug file opened.                                             */
   /********************************************************************************/
   delete lex;
+  delete generator;
   p2file.close();
 }
 
@@ -126,7 +125,8 @@ int SyntacticalAnalyzer::program ()
   int errors = 0;
   int rule = table[(int)PROGRAM][tokenmap[token]]; // PROGRAM is enum type corresponding to program row in table.
   p2file << "Using rule " << rule << endl;
-  cpp << "#include<iostream>\n#include \"Object.h\"\nusing namespace std;\n\n";//includes
+
+  generator->writeCode("#include<iostream>\n#include \"Object.h\"\nusing namespace std;\n\n");//includes
   if (token != LPAREN_T)
   {
     lex->ReportError("Unexpected token or character: " + token_names[token]);
@@ -204,23 +204,25 @@ int SyntacticalAnalyzer::define ()
     errors++;     
   }
   if(lex -> GetLexeme() == "main")
-    cpp << "int main";
+    generator->writeCode("int main");
   else
-    cpp << "Object " << lex -> GetLexeme();
+    generator->writeCode("Object " + lex -> GetLexeme());
   
   token = lex->GetToken();
-  cpp << "(";
+  generator->writeCode("(");
   errors += param_list();
-  cpp << ")\n";
+  generator->writeCode(")\n");
   first = true;
   token = lex->GetToken();
-  cpp << "{\n\n\t";
+  generator->writeCode("{\n\n\t");
+  generator->writeCode("Object " + generator->getReturn() + ";\n\t");
   errors += stmt();
 
   errors += stmt_list(";");
 
   token = lex->GetToken();
-  cpp << "\n}\n\n";
+  generator->writeCode("return " + generator->getReturn() + ";\n");
+  generator->writeCode("\n}\n\n");
   p2file << "Ending <define>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
   
@@ -271,11 +273,11 @@ int SyntacticalAnalyzer::param_list ()
   {
     if(first)
     {
-     cpp << "Object " << lex -> GetLexeme();
+     generator->writeCode("Object " + lex -> GetLexeme());
      first = false;
    }
    else
-     cpp << ", Object " << lex ->GetLexeme();
+     generator->writeCode(", Object " + lex ->GetLexeme());
    token = lex->GetToken();
    errors += param_list();
  }
@@ -305,17 +307,16 @@ int SyntacticalAnalyzer::stmt ()
   int rule = table[(int)STMT][tokenmap[token]];
   p2file << "Using rule " << rule << endl;
 
-  cpp << "(";
+  //generator->writeCode("(");
 
   if (token == IDENT_T)
   {
-    cpp << lex->GetLexeme();
+    generator->writeCode(lex->GetLexeme() + "(");
     token = lex->GetToken();
   }
   else if (token == LPAREN_T)
   {
     token = lex->GetToken();
-
     errors += action();
     if (token != RPAREN_T)
     {
@@ -333,7 +334,7 @@ int SyntacticalAnalyzer::stmt ()
       token = lex->GetToken();
     }
 
-    cpp << ")";
+    //generator->writeCode(")");
     p2file << "Ending <stmt>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
 
     return errors;
@@ -357,7 +358,15 @@ int SyntacticalAnalyzer::stmt ()
 
     if (action == ";")
     {
-       cpp << ";\n\t";
+      if (!ifstmt)
+      {
+        generator->writeCode(";\n\t");
+      }
+      else
+      {
+        generator->writeCode("\n\t");
+      }
+      ifstmt = false;
     }
 
     if ((token != RPAREN_T) && (token != EOF_T))
@@ -365,7 +374,7 @@ int SyntacticalAnalyzer::stmt ()
       errors += stmt();
       if (token != RPAREN_T)
       {
-        cpp << action;
+        generator->writeCode(action);
       }
       errors += stmt_list(action);
     }
@@ -396,6 +405,7 @@ int SyntacticalAnalyzer::stmt ()
     }
     else
     {
+      generator->writeCode(generator->getReturn() + " = ");
       errors += stmt();
     }
 
@@ -412,16 +422,14 @@ int SyntacticalAnalyzer::stmt ()
   /* It will check for the expected tokens in program, and then call the correct  */
   /* functions corresponding to the following non-terminals.                      */
   /********************************************************************************/
-
     int errors = 0; 
     p2file << "Starting <literal>. ";
     p2file << "Current token = " << token_names[token]  << endl;
     int rule = table[(int)LITERAL][tokenmap[token]];
     p2file << "Using rule " << rule << endl;
-
     if (token == NUMLIT_T)
     {
-      cpp << "Object(" << lex->GetLexeme() << ")";
+      generator->writeCode("Object(" + lex->GetLexeme() + ")");
       token = lex->GetToken();    
       // do nothing. continue to return statement. 
     }
@@ -486,10 +494,17 @@ int SyntacticalAnalyzer::stmt ()
     }
     else if (token == IF_T)
     {
+      ifstmt = true;
+      generator->writeCode(lex->GetLexeme() + "(");
       token = lex->GetToken();
       errors += stmt();
+      generator->writeCode(")\n\t{\n\t\t" );
+      generator->writeCode(generator->getReturn() + " = ");
       errors += stmt();
+      generator->writeCode("\n\t}\n\telse\n\t{\n\t\t");
       errors += else_part();
+      generator->writeCode("\n\t}\n");
+
     }
     else if(token == CONS_T)
     {
@@ -506,14 +521,22 @@ int SyntacticalAnalyzer::stmt ()
     else if ((token == PLUS_T) || (token == AND_T) || (token == OR_T) || (token == MULT_T) || (token == EQUALTO_T) || (token == GT_T) || 
      (token == LT_T) || (token == GTE_T) || (token == LTE_T) || (token == IDENT_T))
     {
+      generator->writeCode("(");
+      if (token == IDENT_T)
+      {
+        generator->writeCode(lex->GetLexeme());
+      }
       token = lex->GetToken();
       errors += stmt_list(operation);
+      generator->writeCode(")");
     }
     else if((token == MINUS_T) || (token == DIV_T))
     {
+      generator->writeCode("(");
       token = lex->GetToken();
       errors += stmt();
       errors += stmt_list(operation);
+      generator->writeCode(")");
       if (token != RPAREN_T)
       {
        lex->ReportError("Unexpected token or character: " + token_names[token] + ". Expected token: RPAREN_T");

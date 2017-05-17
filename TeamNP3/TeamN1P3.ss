@@ -12,6 +12,21 @@
 	)
 
 (define (plusMultTest n)
-	(+ (* n 17) n 8 92)
+	(+ (* n 17) n (* 8 92))
 	(+ n 4 6)
+	)
+
+(define (ifstmt a b)
+	(if(< a b)
+		a
+		b
+		)
+	(if(>= a b)
+		b
+		a
+		)
+	)
+
+(define(funcAll a b c)
+	(plusTest a)
 	)

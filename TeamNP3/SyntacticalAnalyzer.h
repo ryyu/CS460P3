@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include "LexicalAnalyzer.h"
+#include "CodeGen.h"
 
 using namespace std;
 
@@ -21,12 +22,14 @@ class SyntacticalAnalyzer
 	~SyntacticalAnalyzer ();
     private:
 	LexicalAnalyzer * lex;
+	CodeGen * generator;
 	ofstream p2file;
 	ofstream cpp;
 	token_type token;
 	int program ();
 	//int errors;
 	bool first;
+	bool ifstmt;
 	int define ();
 	int more_defines ();
 	int param_list ();
