@@ -23,10 +23,9 @@
 		)
 	(if(>= a b)
 		b
-		a
 		)
 	)
 
 (define(funcAll a b c)
-	(plusTest a)
+	(plusTest a b)
 	)

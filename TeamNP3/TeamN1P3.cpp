@@ -6,7 +6,7 @@ Object multTest()
 {
 
 	Object retValue$;
-	(Object(7) * Object(2));
+	retValue$ = (Object(7) * Object(2));
 	return retValue$;
 
 }
@@ -15,7 +15,7 @@ Object plusTest(Object n)
 {
 
 	Object retValue$;
-	(n( + Object(4) + Object(6));
+	retValue$ = (n + Object(4) + Object(6));
 	return retValue$;
 
 }
@@ -24,8 +24,8 @@ Object plusMultTest(Object n)
 {
 
 	Object retValue$;
-	((n( * Object(17)) + n( + (Object(8) * Object(92)));
-	(n( + Object(4) + Object(6));
+	retValue$ = (retValue$ = (n * Object(17)) + n + retValue$ = (Object(8) * Object(92)));
+	retValue$ = (n + Object(4) + Object(6));
 	return retValue$;
 
 }
@@ -34,22 +34,18 @@ Object ifstmt(Object a, Object b)
 {
 
 	Object retValue$;
-	if((a( < b())
+	if((a < b))
 	{
-		retValue$ = a(
+		retValue$ = a;
 	}
 	else
 	{
-		retValue$ = b(
+		retValue$ = b;
 	}
 
-	if((a( >= b())
+	if((a >= b))
 	{
-		retValue$ = b(
-	}
-	else
-	{
-		retValue$ = a(
+		retValue$ = b;
 	}
 
 	return retValue$;
@@ -60,7 +56,7 @@ Object funcAll(Object a, Object b, Object c)
 {
 
 	Object retValue$;
-	(a();
+	retValue$ = plusTest(a, b);
 	return retValue$;
 
 }

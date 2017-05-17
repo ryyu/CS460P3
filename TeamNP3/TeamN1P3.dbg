@@ -101,14 +101,12 @@ program function called
 	RPAREN_T        )
   25: 		b
 	IDENT_T         b
-  26: 		a
-	IDENT_T         a
-  27: 		)
+  26: 		)
 	RPAREN_T        )
-  28: 	)
+  27: 	)
 	RPAREN_T        )
-  29: 
-  30: (define(funcAll a b c)
+  28: 
+  29: (define(funcAll a b c)
 	LPAREN_T        (
 	DEFINE_T        define
 	LPAREN_T        (
@@ -117,11 +115,12 @@ program function called
 	IDENT_T         b
 	IDENT_T         c
 	RPAREN_T        )
-  31: 	(plusTest a)
+  30: 	(plusTest a b)
 	LPAREN_T        (
 	IDENT_T         plusTest
 	IDENT_T         a
+	IDENT_T         b
 	RPAREN_T        )
-  32: 	)
+  31: 	)
 	RPAREN_T        )
 0 errors found in input file

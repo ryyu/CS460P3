@@ -311,7 +311,7 @@ int SyntacticalAnalyzer::stmt ()
 
   if (token == IDENT_T)
   {
-    generator->writeCode(lex->GetLexeme() + "(");
+    generator->writeCode(lex->GetLexeme());
     token = lex->GetToken();
   }
   else if (token == LPAREN_T)
@@ -405,6 +405,7 @@ int SyntacticalAnalyzer::stmt ()
     }
     else
     {
+      generator->writeCode(";\n\t}\n\telse\n\t{\n\t\t");
       generator->writeCode(generator->getReturn() + " = ");
       errors += stmt();
     }
@@ -501,10 +502,8 @@ int SyntacticalAnalyzer::stmt ()
       generator->writeCode(")\n\t{\n\t\t" );
       generator->writeCode(generator->getReturn() + " = ");
       errors += stmt();
-      generator->writeCode("\n\t}\n\telse\n\t{\n\t\t");
       errors += else_part();
-      generator->writeCode("\n\t}\n");
-
+      generator->writeCode(";\n\t}\n");
     }
     else if(token == CONS_T)
     {
@@ -521,11 +520,16 @@ int SyntacticalAnalyzer::stmt ()
     else if ((token == PLUS_T) || (token == AND_T) || (token == OR_T) || (token == MULT_T) || (token == EQUALTO_T) || (token == GT_T) || 
      (token == LT_T) || (token == GTE_T) || (token == LTE_T) || (token == IDENT_T))
     {
-      generator->writeCode("(");
+      if (!ifstmt)
+      {
+        generator->writeCode(generator->getReturn() + " = ");
+      }
       if (token == IDENT_T)
       {
         generator->writeCode(lex->GetLexeme());
+        operation = ", ";
       }
+      generator->writeCode("(");
       token = lex->GetToken();
       errors += stmt_list(operation);
       generator->writeCode(")");

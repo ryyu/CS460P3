@@ -24,11 +24,10 @@ Input file: TeamN1P3.ss
   23: 		)
   24: 	(if(>= a b)
   25: 		b
-  26: 		a
-  27: 		)
-  28: 	)
-  29: 
-  30: (define(funcAll a b c)
-  31: 	(plusTest a)
-  32: 	)
+  26: 		)
+  27: 	)
+  28: 
+  29: (define(funcAll a b c)
+  30: 	(plusTest a b)
+  31: 	)
 0 errors found in input file
