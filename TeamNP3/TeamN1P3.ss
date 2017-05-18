@@ -13,6 +13,7 @@
 
 (define (plusMultTest n)
 	(+ (* n 17) n (* 8 92))
+	(+ 2 2)
 	(+ n 4 6)
 	)
 
@@ -27,5 +28,31 @@
 	)
 
 (define(funcAll a b c)
-	(plusTest a b)
+	(plusTest a)
+	)
+
+(define (predCheck b)
+	(if (null? b)
+		b
+		)
+	(if (not (list? b))
+		7
+		)
+	)
+
+(define (consTest a)
+	(cons 'abcxyz '(1 2 3 4 5))
+	)
+
+(define (coutTest)
+	(display (plusTest 2))
+	)
+
+(define (listopTest mylist)
+	(cdr '(a b c))
+	(cdr '(d e f))
+	(car (cdr mylist))
+	)
+
+(define (main)
 	)

@@ -14,20 +14,47 @@ Input file: TeamN1P3.ss
   13: 
   14: (define (plusMultTest n)
   15: 	(+ (* n 17) n (* 8 92))
-  16: 	(+ n 4 6)
-  17: 	)
-  18: 
-  19: (define (ifstmt a b)
-  20: 	(if(< a b)
-  21: 		a
-  22: 		b
-  23: 		)
-  24: 	(if(>= a b)
-  25: 		b
-  26: 		)
-  27: 	)
-  28: 
-  29: (define(funcAll a b c)
-  30: 	(plusTest a b)
-  31: 	)
+  16: 	(+ 2 2)
+  17: 	(+ n 4 6)
+  18: 	)
+  19: 
+  20: (define (ifstmt a b)
+  21: 	(if(< a b)
+  22: 		a
+  23: 		b
+  24: 		)
+  25: 	(if(>= a b)
+  26: 		b
+  27: 		)
+  28: 	)
+  29: 
+  30: (define(funcAll a b c)
+  31: 	(plusTest a)
+  32: 	)
+  33: 
+  34: (define (predCheck b)
+  35: 	(if (null? b)
+  36: 		b
+  37: 		)
+  38: 	(if (not (list? b))
+  39: 		7
+  40: 		)
+  41: 	)
+  42: 
+  43: (define (consTest a)
+  44: 	(cons 'abcxyz '(1 2 3 4 5))
+  45: 	)
+  46: 
+  47: (define (coutTest)
+  48: 	(display (plusTest 2))
+  49: 	)
+  50: 
+  51: (define (listopTest mylist)
+  52: 	(cdr '(a b c))
+  53: 	(cdr '(d e f))
+  54: 	(car (cdr mylist))
+  55: 	)
+  56: 
+  57: (define (main)
+  58: 	)
 0 errors found in input file
