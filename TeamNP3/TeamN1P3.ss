@@ -1,8 +1,3 @@
-;(define (not_main a b)
- ; (display 5)
-  ;(newline)
-;)
-
 (define (multTest)
 	(* 7 2)
 	)
@@ -22,9 +17,9 @@
 		a
 		b
 		)
-	(if(>= a b)
-		b
-		)
+	;;(if(>= a b)
+	;;	b
+	;;	)
 	)
 
 (define(funcAll a b c)
@@ -33,15 +28,22 @@
 
 (define (predCheck b)
 	(if (null? b)
-		b
-		)
-	(if (not (list? b))
-		7
-		)
+		b	
+		(if (not (list? b))
+			7
+			(if (symbol? b)
+				8
+				(if (> b 8)
+					9
+					(+ 2 2)
+					)
+				)
+			)
 	)
+)
 
-(define (consTest a)
-	(cons 'abcxyz '(1 2 3 4 5))
+(define (consTest lst)
+	(cons lst '(1 2 3 4 5))
 	)
 
 (define (coutTest)
@@ -55,4 +57,25 @@
 	)
 
 (define (main)
+	(display 'Hello_world)
+	(newline)
+	(display (multTest))
+	(newline)
+	(display (plusTest 5))
+	(newline)
+	(display (plusMultTest 17))
+	(newline)
+	(display (ifstmt 1 3))
+	(newline)
+	(display (funcAll 28 31 34))
+	(newline)
+	(display (predCheck '()))
+	(newline)
+	(display (consTest '(a b c)))
+	(newline)
+	(coutTest)
+	(newline)
+	(display (listopTest '(a b c)))
 	)
+
+;;(main)

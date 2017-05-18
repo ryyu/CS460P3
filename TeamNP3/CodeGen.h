@@ -12,10 +12,14 @@ class CodeGen
   	~CodeGen();
   	void writeCode(string);
   	string getReturn();
+  	void increaseIndent();
+  	void decreaseIndent();
+  	void writeIndent();
 
   private:
   	ofstream cpp;
   	string ret;
+  	int indent;
 };
 
 #endif

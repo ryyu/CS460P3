@@ -10,6 +10,7 @@ CodeGen::CodeGen(string filename)
   	filename += 'p';
 	cpp.open(filename);
 	ret = "retValue$";
+	indent = 0;
 }
 
 
@@ -20,12 +21,29 @@ CodeGen::~CodeGen()
 
 
 void CodeGen::writeCode(string code)
-{
+{	
 	cpp << code;
 }
 
+void CodeGen::writeIndent()
+{
+	for(int i = 0; i < indent; i++)
+	{
+		cpp << "    ";
+	}
+}
 
 string CodeGen::getReturn()
 {
 	return ret;
+}
+
+void CodeGen::increaseIndent()
+{
+	indent++;
+}
+
+void CodeGen::decreaseIndent()
+{
+	indent--;
 }

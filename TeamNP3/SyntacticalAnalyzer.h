@@ -30,6 +30,8 @@ class SyntacticalAnalyzer
 	//int errors;
 	bool first;
 	bool ifstmt;
+	bool flagPrint;
+	bool inElse;
 	int define ();
 	int more_defines ();
 	int param_list ();

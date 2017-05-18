@@ -90,6 +90,8 @@ SyntacticalAnalyzer::SyntacticalAnalyzer (char * filename)
   string file = string(filename);
   first = true;
   ifstmt = false;
+  flagPrint = false;
+  inElse = false;
   generator = new CodeGen(file);
   
   filename[fnlength-2] = 'p';
@@ -214,8 +216,11 @@ int SyntacticalAnalyzer::define ()
   generator->writeCode(")\n");
   first = true;
   token = lex->GetToken();
-  generator->writeCode("{\n\n\t");
-  generator->writeCode("Object " + generator->getReturn() + ";\n\t");
+  generator->writeCode("{\n\n");
+  generator->increaseIndent();
+  generator->writeIndent();
+  generator->writeCode("Object " + generator->getReturn() + ";\n");
+  generator->writeIndent();
   
   errors += stmt();
   errors += stmt_list(";");
@@ -223,6 +228,7 @@ int SyntacticalAnalyzer::define ()
   token = lex->GetToken();
   generator->writeCode("return " + generator->getReturn() + ";\n");
   generator->writeCode("\n}\n\n");
+  generator->decreaseIndent();
   p2file << "Ending <define>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
   return errors;
   
@@ -312,11 +318,22 @@ int SyntacticalAnalyzer::stmt ()
 
   if (token == IDENT_T)
   {
+    if (first)
+    {
+      generator->writeCode(generator->getReturn() + " = ");
+    }
     generator->writeCode(lex->GetLexeme());
     token = lex->GetToken();
   }
   else if (token == LPAREN_T)
   {
+    /*
+    if (inElse)
+    {
+      inElse = false;
+      flagPrint = true;
+      generator->writeCode(generator->getReturn() + " = ");
+    }*/
     token = lex->GetToken();
     errors += action();
     if (token != RPAREN_T)
@@ -360,15 +377,18 @@ int SyntacticalAnalyzer::stmt ()
     {
       if (!ifstmt)
       {
-        generator->writeCode(";\n\t");
+        generator->writeCode(";\n");
+        generator->writeIndent();
         if (token != RPAREN_T)
         {
-          generator->writeCode(generator->getReturn() + " = ");
+          //generator->writeCode(generator->getReturn() + " = ");
+          flagPrint = true;
         }
       }
       else
       {
-        generator->writeCode("\n\t");
+        generator->writeCode("\n");
+        generator->writeIndent();
       }
       ifstmt = false;
     }
@@ -404,13 +424,28 @@ int SyntacticalAnalyzer::stmt ()
 
     if (token == RPAREN_T)
     {
-
+      inElse = false;
     }
     else
     {
-      generator->writeCode(";\n\t}\n\telse\n\t{\n\t\t");
-      generator->writeCode(generator->getReturn() + " = ");
+      generator->writeIndent();
+      generator->writeCode("else\n");
+      generator->writeIndent();
+      generator->writeCode("{\n");
+      generator->increaseIndent();
+      generator->writeIndent();
+      //ifstmt = true;
+      if (!inElse)
+      {
+         generator->writeCode(generator->getReturn() + " = ");
+      }
       errors += stmt();
+      if(!inElse)
+      {
+        generator->writeCode(";");
+        inElse = true;
+      }
+
     }
 
     p2file << "Ending <else_part>. Current token = " << token_names[token] << ". Errors = " << errors << endl;
@@ -433,7 +468,16 @@ int SyntacticalAnalyzer::stmt ()
     p2file << "Using rule " << rule << endl;
     if (token == NUMLIT_T)
     {
+      if (inElse)
+      {
+        //generator->writeCode(generator->getReturn() + " = ");
+      }
       generator->writeCode("Object(" + lex->GetLexeme() + ")");
+      if (inElse)
+      {
+        //generator->writeCode(";\n");
+      }
+      
       token = lex->GetToken();    
       // do nothing. continue to return statement. 
     }
@@ -508,6 +552,7 @@ int SyntacticalAnalyzer::stmt ()
     }
     else if (token == IF_T)
     {
+      //inElse = false;
       ifstmt = true;
       if (first)
       {
@@ -516,19 +561,42 @@ int SyntacticalAnalyzer::stmt ()
       generator->writeCode(lex->GetLexeme() + "(");
       token = lex->GetToken();
       errors += stmt();
-      generator->writeCode(")\n\t{\n\t\t" );
+      generator->writeCode(")\n");
+      generator->writeIndent();
+      generator->increaseIndent();
+      generator->writeCode("{\n");
+      //generator->increaseIndent();
+      generator->writeIndent();
+      //generator->decreaseIndent();
       generator->writeCode(generator->getReturn() + " = ");
       errors += stmt();
+      generator->writeCode(";\n");
+      generator->decreaseIndent();
+      generator->writeIndent();
+      generator->writeCode("}\n");
+      //generator->decreaseIndent();
+      if (inElse && !ifstmt)
+      {
+        inElse = false;
+      }
       errors += else_part();
-      generator->writeCode(";\n\t}\n");
+      generator ->writeCode("\n");
+      generator -> decreaseIndent();
+      //generator->decreaseIndent();
+      generator->writeIndent();
+      generator->writeCode("}\n");
+      
     }
     else if (token == CONS_T)
     {
-      if (first)
+      
+      if (flagPrint || first)
       {
-        generator->writeCode(generator->getReturn() + " = ");
+        flagPrint = false;
         first = false;
+        generator->writeCode(generator->getReturn() + " = ");
       }
+      
       generator->writeCode("cons(");
       token = lex->GetToken();
       errors += stmt();
@@ -538,10 +606,11 @@ int SyntacticalAnalyzer::stmt ()
     }
     else if (token == LISTOP_T)
     {
-      if (first)
+      if (flagPrint || first)
       {
-        generator->writeCode(generator->getReturn() + " = ");
+        flagPrint = false;
         first = false;
+        generator->writeCode(generator->getReturn() + " = ");
       }
       string listOperation = lex->GetLexeme();
       generator->writeCode("listop(\"" + listOperation + "\", ");
@@ -559,10 +628,12 @@ int SyntacticalAnalyzer::stmt ()
     else if ((token == NUMBERP_T) || (token == SYMBOLP_T) || (token == LISTP_T) || (token == ZEROP_T) || 
       (token == NULLP_T) || (token == CHARP_T) || (token == STRINGP_T))
     {
-      if (first)
+      
+      if (flagPrint || first)
       {
-        generator->writeCode(generator->getReturn() + " = ");
+        flagPrint = false;
         first = false;
+        generator->writeCode(generator->getReturn() + " = ");
       }
       string predicate = lex->GetLexeme();
       predicate.replace(predicate.length() - 1, predicate.length(), "p");
@@ -574,15 +645,17 @@ int SyntacticalAnalyzer::stmt ()
     else if ((token == PLUS_T) || (token == AND_T) || (token == OR_T) || (token == MULT_T) || (token == EQUALTO_T) || (token == GT_T) || 
      (token == LT_T) || (token == GTE_T) || (token == LTE_T) || (token == IDENT_T))
     {
-      if (first)
-      {
-        generator->writeCode(generator->getReturn() + " = ");
-        first = false;
-      }
+
       if (token == IDENT_T)
       {
         generator->writeCode(lex->GetLexeme());
         operation = ", ";
+      }
+      else if (flagPrint || first)
+      {
+        flagPrint = false;
+        first = false;
+        generator->writeCode(generator->getReturn() + " = ");
       }
       generator->writeCode("(");
       token = lex->GetToken();
@@ -591,10 +664,12 @@ int SyntacticalAnalyzer::stmt ()
     }
     else if((token == MINUS_T) || (token == DIV_T))
     {
-      if (first)
+      
+      if (flagPrint || first)
       {
-        generator->writeCode(generator->getReturn() + " = ");
+        flagPrint = false;
         first = false;
+        generator->writeCode(generator->getReturn() + " = ");
       }
       generator->writeCode("(");
       token = lex->GetToken();

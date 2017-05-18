@@ -1,50 +1,45 @@
 Input file: TeamN1P3.ss
-   1: ;(define (not_main a b)
-   2:  ; (display 5)
-   3:   ;(newline)
-   4: ;)
-   5: 
-   6: (define (multTest)
+   1: (define (multTest)
 	LPAREN_T        (
 program function called
 	DEFINE_T        define
 	LPAREN_T        (
 	IDENT_T         multTest
 	RPAREN_T        )
-   7: 	(* 7 2)
+   2: 	(* 7 2)
 	LPAREN_T        (
 	MULT_T          *
 	NUMLIT_T        7
 	NUMLIT_T        2
 	RPAREN_T        )
-   8: 	)
+   3: 	)
 	RPAREN_T        )
-   9: 
-  10: (define (plusTest n)
+   4: 
+   5: (define (plusTest n)
 	LPAREN_T        (
 	DEFINE_T        define
 	LPAREN_T        (
 	IDENT_T         plusTest
 	IDENT_T         n
 	RPAREN_T        )
-  11: 	(+ n 4 6)
+   6: 	(+ n 4 6)
 	LPAREN_T        (
 	PLUS_T          +
 	IDENT_T         n
 	NUMLIT_T        4
 	NUMLIT_T        6
 	RPAREN_T        )
-  12: 	)
+   7: 	)
 	RPAREN_T        )
-  13: 
-  14: (define (plusMultTest n)
+   8: 
+   9: (define (plusMultTest n)
 	LPAREN_T        (
 	DEFINE_T        define
 	LPAREN_T        (
 	IDENT_T         plusMultTest
 	IDENT_T         n
 	RPAREN_T        )
-  15: 	(+ (* n 17) n (* 8 92))
+  10: 	(+ (* n 17) n (* 8 92))
 	LPAREN_T        (
 	PLUS_T          +
 	LPAREN_T        (
@@ -59,23 +54,23 @@ program function called
 	NUMLIT_T        92
 	RPAREN_T        )
 	RPAREN_T        )
-  16: 	(+ 2 2)
+  11: 	(+ 2 2)
 	LPAREN_T        (
 	PLUS_T          +
 	NUMLIT_T        2
 	NUMLIT_T        2
 	RPAREN_T        )
-  17: 	(+ n 4 6)
+  12: 	(+ n 4 6)
 	LPAREN_T        (
 	PLUS_T          +
 	IDENT_T         n
 	NUMLIT_T        4
 	NUMLIT_T        6
 	RPAREN_T        )
-  18: 	)
+  13: 	)
 	RPAREN_T        )
-  19: 
-  20: (define (ifstmt a b)
+  14: 
+  15: (define (ifstmt a b)
 	LPAREN_T        (
 	DEFINE_T        define
 	LPAREN_T        (
@@ -83,7 +78,7 @@ program function called
 	IDENT_T         a
 	IDENT_T         b
 	RPAREN_T        )
-  21: 	(if(< a b)
+  16: 	(if(< a b)
 	LPAREN_T        (
 	IF_T            if
 	LPAREN_T        (
@@ -91,28 +86,19 @@ program function called
 	IDENT_T         a
 	IDENT_T         b
 	RPAREN_T        )
-  22: 		a
+  17: 		a
 	IDENT_T         a
-  23: 		b
+  18: 		b
 	IDENT_T         b
-  24: 		)
+  19: 		)
 	RPAREN_T        )
-  25: 	(if(>= a b)
-	LPAREN_T        (
-	IF_T            if
-	LPAREN_T        (
-	GTE_T           >=
-	IDENT_T         a
-	IDENT_T         b
+  20: 	;;(if(>= a b)
+  21: 	;;	b
+  22: 	;;	)
+  23: 	)
 	RPAREN_T        )
-  26: 		b
-	IDENT_T         b
-  27: 		)
-	RPAREN_T        )
-  28: 	)
-	RPAREN_T        )
-  29: 
-  30: (define(funcAll a b c)
+  24: 
+  25: (define(funcAll a b c)
 	LPAREN_T        (
 	DEFINE_T        define
 	LPAREN_T        (
@@ -121,33 +107,31 @@ program function called
 	IDENT_T         b
 	IDENT_T         c
 	RPAREN_T        )
-  31: 	(plusTest a)
+  26: 	(plusTest a)
 	LPAREN_T        (
 	IDENT_T         plusTest
 	IDENT_T         a
 	RPAREN_T        )
-  32: 	)
+  27: 	)
 	RPAREN_T        )
-  33: 
-  34: (define (predCheck b)
+  28: 
+  29: (define (predCheck b)
 	LPAREN_T        (
 	DEFINE_T        define
 	LPAREN_T        (
 	IDENT_T         predCheck
 	IDENT_T         b
 	RPAREN_T        )
-  35: 	(if (null? b)
+  30: 	(if (null? b)
 	LPAREN_T        (
 	IF_T            if
 	LPAREN_T        (
 	NULLP_T         null?
 	IDENT_T         b
 	RPAREN_T        )
-  36: 		b
+  31: 		b	
 	IDENT_T         b
-  37: 		)
-	RPAREN_T        )
-  38: 	(if (not (list? b))
+  32: 		(if (not (list? b))
 	LPAREN_T        (
 	IF_T            if
 	LPAREN_T        (
@@ -157,25 +141,55 @@ program function called
 	IDENT_T         b
 	RPAREN_T        )
 	RPAREN_T        )
-  39: 		7
+  33: 			7
 	NUMLIT_T        7
-  40: 		)
+  34: 			(if (symbol? b)
+	LPAREN_T        (
+	IF_T            if
+	LPAREN_T        (
+	SYMBOLP_T       symbol?
+	IDENT_T         b
 	RPAREN_T        )
-  41: 	)
+  35: 				8
+	NUMLIT_T        8
+  36: 				(if (> b 8)
+	LPAREN_T        (
+	IF_T            if
+	LPAREN_T        (
+	GT_T            >
+	IDENT_T         b
+	NUMLIT_T        8
 	RPAREN_T        )
-  42: 
-  43: (define (consTest a)
+  37: 					9
+	NUMLIT_T        9
+  38: 					(+ 2 2)
+	LPAREN_T        (
+	PLUS_T          +
+	NUMLIT_T        2
+	NUMLIT_T        2
+	RPAREN_T        )
+  39: 					)
+	RPAREN_T        )
+  40: 				)
+	RPAREN_T        )
+  41: 			)
+	RPAREN_T        )
+  42: 	)
+	RPAREN_T        )
+  43: )
+	RPAREN_T        )
+  44: 
+  45: (define (consTest lst)
 	LPAREN_T        (
 	DEFINE_T        define
 	LPAREN_T        (
 	IDENT_T         consTest
-	IDENT_T         a
+	IDENT_T         lst
 	RPAREN_T        )
-  44: 	(cons 'abcxyz '(1 2 3 4 5))
+  46: 	(cons lst '(1 2 3 4 5))
 	LPAREN_T        (
 	CONS_T          cons
-	QUOTE_T         '
-	IDENT_T         abcxyz
+	IDENT_T         lst
 	QUOTE_T         '
 	LPAREN_T        (
 	NUMLIT_T        1
@@ -185,16 +199,16 @@ program function called
 	NUMLIT_T        5
 	RPAREN_T        )
 	RPAREN_T        )
-  45: 	)
+  47: 	)
 	RPAREN_T        )
-  46: 
-  47: (define (coutTest)
+  48: 
+  49: (define (coutTest)
 	LPAREN_T        (
 	DEFINE_T        define
 	LPAREN_T        (
 	IDENT_T         coutTest
 	RPAREN_T        )
-  48: 	(display (plusTest 2))
+  50: 	(display (plusTest 2))
 	LPAREN_T        (
 	DISPLAY_T       display
 	LPAREN_T        (
@@ -202,17 +216,17 @@ program function called
 	NUMLIT_T        2
 	RPAREN_T        )
 	RPAREN_T        )
-  49: 	)
+  51: 	)
 	RPAREN_T        )
-  50: 
-  51: (define (listopTest mylist)
+  52: 
+  53: (define (listopTest mylist)
 	LPAREN_T        (
 	DEFINE_T        define
 	LPAREN_T        (
 	IDENT_T         listopTest
 	IDENT_T         mylist
 	RPAREN_T        )
-  52: 	(cdr '(a b c))
+  54: 	(cdr '(a b c))
 	LPAREN_T        (
 	LISTOP_T        cdr
 	QUOTE_T         '
@@ -222,7 +236,7 @@ program function called
 	IDENT_T         c
 	RPAREN_T        )
 	RPAREN_T        )
-  53: 	(cdr '(d e f))
+  55: 	(cdr '(d e f))
 	LPAREN_T        (
 	LISTOP_T        cdr
 	QUOTE_T         '
@@ -232,7 +246,7 @@ program function called
 	IDENT_T         f
 	RPAREN_T        )
 	RPAREN_T        )
-  54: 	(car (cdr mylist))
+  56: 	(car (cdr mylist))
 	LPAREN_T        (
 	LISTOP_T        car
 	LPAREN_T        (
@@ -240,15 +254,141 @@ program function called
 	IDENT_T         mylist
 	RPAREN_T        )
 	RPAREN_T        )
-  55: 	)
+  57: 	)
 	RPAREN_T        )
-  56: 
-  57: (define (main)
+  58: 
+  59: (define (main)
 	LPAREN_T        (
 	DEFINE_T        define
 	LPAREN_T        (
 	IDENT_T         main
 	RPAREN_T        )
-  58: 	)
+  60: 	(display 'Hello_world)
+	LPAREN_T        (
+	DISPLAY_T       display
+	QUOTE_T         '
+	IDENT_T         Hello_world
 	RPAREN_T        )
+  61: 	(newline)
+	LPAREN_T        (
+	NEWLINE_T       newline
+	RPAREN_T        )
+  62: 	(display (multTest))
+	LPAREN_T        (
+	DISPLAY_T       display
+	LPAREN_T        (
+	IDENT_T         multTest
+	RPAREN_T        )
+	RPAREN_T        )
+  63: 	(newline)
+	LPAREN_T        (
+	NEWLINE_T       newline
+	RPAREN_T        )
+  64: 	(display (plusTest 5))
+	LPAREN_T        (
+	DISPLAY_T       display
+	LPAREN_T        (
+	IDENT_T         plusTest
+	NUMLIT_T        5
+	RPAREN_T        )
+	RPAREN_T        )
+  65: 	(newline)
+	LPAREN_T        (
+	NEWLINE_T       newline
+	RPAREN_T        )
+  66: 	(display (plusMultTest 17))
+	LPAREN_T        (
+	DISPLAY_T       display
+	LPAREN_T        (
+	IDENT_T         plusMultTest
+	NUMLIT_T        17
+	RPAREN_T        )
+	RPAREN_T        )
+  67: 	(newline)
+	LPAREN_T        (
+	NEWLINE_T       newline
+	RPAREN_T        )
+  68: 	(display (ifstmt 1 3))
+	LPAREN_T        (
+	DISPLAY_T       display
+	LPAREN_T        (
+	IDENT_T         ifstmt
+	NUMLIT_T        1
+	NUMLIT_T        3
+	RPAREN_T        )
+	RPAREN_T        )
+  69: 	(newline)
+	LPAREN_T        (
+	NEWLINE_T       newline
+	RPAREN_T        )
+  70: 	(display (funcAll 28 31 34))
+	LPAREN_T        (
+	DISPLAY_T       display
+	LPAREN_T        (
+	IDENT_T         funcAll
+	NUMLIT_T        28
+	NUMLIT_T        31
+	NUMLIT_T        34
+	RPAREN_T        )
+	RPAREN_T        )
+  71: 	(newline)
+	LPAREN_T        (
+	NEWLINE_T       newline
+	RPAREN_T        )
+  72: 	(display (predCheck '()))
+	LPAREN_T        (
+	DISPLAY_T       display
+	LPAREN_T        (
+	IDENT_T         predCheck
+	QUOTE_T         '
+	LPAREN_T        (
+	RPAREN_T        )
+	RPAREN_T        )
+	RPAREN_T        )
+  73: 	(newline)
+	LPAREN_T        (
+	NEWLINE_T       newline
+	RPAREN_T        )
+  74: 	(display (consTest '(a b c)))
+	LPAREN_T        (
+	DISPLAY_T       display
+	LPAREN_T        (
+	IDENT_T         consTest
+	QUOTE_T         '
+	LPAREN_T        (
+	IDENT_T         a
+	IDENT_T         b
+	IDENT_T         c
+	RPAREN_T        )
+	RPAREN_T        )
+	RPAREN_T        )
+  75: 	(newline)
+	LPAREN_T        (
+	NEWLINE_T       newline
+	RPAREN_T        )
+  76: 	(coutTest)
+	LPAREN_T        (
+	IDENT_T         coutTest
+	RPAREN_T        )
+  77: 	(newline)
+	LPAREN_T        (
+	NEWLINE_T       newline
+	RPAREN_T        )
+  78: 	(display (listopTest '(a b c)))
+	LPAREN_T        (
+	DISPLAY_T       display
+	LPAREN_T        (
+	IDENT_T         listopTest
+	QUOTE_T         '
+	LPAREN_T        (
+	IDENT_T         a
+	IDENT_T         b
+	IDENT_T         c
+	RPAREN_T        )
+	RPAREN_T        )
+	RPAREN_T        )
+  79: 	)
+	RPAREN_T        )
+  80: 
+  81: ;;(main)
 0 errors found in input file
